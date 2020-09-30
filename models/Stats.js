@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
+const teamModel = require('../models/Team');
 
 const statSchema = new mongoose.Schema({
+  teamId: {
+    type: Number,
+  },
   season: {
     slug: {
       type: String,
@@ -60,4 +64,21 @@ const Stat = mongoose.model('Stat', statSchema);
 
 module.exports = {
   Stat,
+  getStatsFilterByYear: async (year) => {
+    return await Stat.aggregate([
+      {
+        $lookup: {
+          from: 'teams',
+          localField: 'teamId',
+          foreignField: 'teamId',
+          as: 'team',
+        },
+      },
+      {
+        $match: {
+          'season.slug': year,
+        },
+      },
+    ]).exec();
+  },
 };

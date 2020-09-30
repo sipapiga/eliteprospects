@@ -52,7 +52,7 @@ async function saveTeamToDatabase(data) {
     const response = await axios.get(url);
     let teams = new Team({
       name: response.data.data.name,
-      id: response.data.data.id,
+      teamId: response.data.data.id,
       logoUrl: response.data.data.logoUrl,
     });
     await teams.save();
@@ -68,6 +68,7 @@ async function saveTeamStatToDatabase(data) {
 
   for (const data of array) {
     const stats = new Stat({
+      teamId: data.team.id,
       season: {
         slug: data.season.slug,
         startYear: data.season.startYear,
@@ -95,7 +96,7 @@ async function saveTeamStatToDatabase(data) {
 async function saveToDatabase() {
   await getStatApiData();
   await getTeamApiData();
-  await disconnect();
+  // await disconnect();
 }
 
 module.exports = {
