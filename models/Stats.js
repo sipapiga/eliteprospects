@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const teamModel = require('../models/Team');
-
 const statSchema = new mongoose.Schema({
   teamId: {
     type: Number,
