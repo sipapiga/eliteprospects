@@ -29,7 +29,7 @@ async function clearDatabase() {
 }
 
 async function getStatApiData() {
-  await clearDatabase();
+  //  await clearDatabase();
   const url = `https://api.eliteprospects.com/v1/team-stats?limit=160&sort=-season,position&league=shl&apiKey=${process.env.API_KEY}`;
   const response = await axios.get(url);
   await saveTeamStatToDatabase(response.data.data);

@@ -17,4 +17,7 @@ const Team = mongoose.model('Team', teamSchema);
 
 module.exports = {
   Team,
+  getTeams: async () => {
+    return await Team.find({});
+  },
 };
