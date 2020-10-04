@@ -4,7 +4,7 @@ const teamSchema = new mongoose.Schema({
   name: {
     type: String,
   },
-  id: {
+  teamId: {
     type: Number,
   },
   logoUrl: {

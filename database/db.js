@@ -32,65 +32,71 @@ async function getStatApiData() {
   await clearDatabase();
   const url = `https://api.eliteprospects.com/v1/team-stats?limit=160&sort=-season,position&league=shl&apiKey=${process.env.API_KEY}`;
   const response = await axios.get(url);
-  saveTeamStatToDatabase(response.data.data);
+  await saveTeamStatToDatabase(response.data.data);
 }
 
 async function getTeamApiData() {
   const url = `https://api.eliteprospects.com/v1/teams?limit=100&sort=name&league=shl&apiKey=${process.env.API_KEY}`;
   const response = await axios.get(url);
-  saveTeamToDatabase(response.data.data);
+  await saveTeamToDatabase(response.data.data);
 }
 
-function saveTeamToDatabase(data) {
+async function saveTeamToDatabase(data) {
+  console.log('Team');
   let idArray = [];
   Object.keys(data).forEach(function (key) {
     idArray.push(data[key].id);
   });
   for (const id of idArray) {
     let url = `https://api.eliteprospects.com/v1/teams/${id}?apiKey=${process.env.API_KEY}`;
-    axios.get(url).then((response) => {
-      let teams = new Team({
-        name: response.data.data.name,
-        id: response.data.data.id,
-        logoUrl: response.data.data.logoUrl,
-      });
-      teams.save();
+    const response = await axios.get(url);
+    let teams = new Team({
+      name: response.data.data.name,
+      teamId: response.data.data.id,
+      logoUrl: response.data.data.logoUrl,
     });
+    await teams.save();
   }
 }
 
-function saveTeamStatToDatabase(data) {
+async function saveTeamStatToDatabase(data) {
   console.log('TeamStat');
+  let array = [];
   Object.keys(data).forEach(function (key) {
+    array.push(data[key]);
+  });
+
+  for (const data of array) {
     const stats = new Stat({
+      teamId: data.team.id,
       season: {
-        slug: data[key].season.slug,
-        startYear: data[key].season.startYear,
-        endYear: data[key].season.endYear,
+        slug: data.season.slug,
+        startYear: data.season.startYear,
+        endYear: data.season.endYear,
       },
-      name: data[key].teamName,
-      leagueName: data[key].leagueName,
-      position: data[key].position,
+      name: data.teamName,
+      leagueName: data.leagueName,
+      position: data.position,
       stats: {
-        GP: data[key].stats.GP,
-        W: data[key].stats.W,
-        L: data[key].stats.L,
-        T: data[key].stats.T,
-        OTW: data[key].stats.OTW,
-        OTL: data[key].stats.OTL,
-        PTS: data[key].stats.PTS,
-        GF: data[key].stats.GF,
-        GA: data[key].stats.GA,
-        GD: data[key].stats.GD,
+        GP: data.stats.GP,
+        W: data.stats.W,
+        L: data.stats.L,
+        T: data.stats.T,
+        OTW: data.stats.OTW,
+        OTL: data.stats.OTL,
+        PTS: data.stats.PTS,
+        GF: data.stats.GF,
+        GA: data.stats.GA,
+        GD: data.stats.GD,
       },
     });
-    stats.save();
-  });
+    await stats.save();
+  }
 }
-function saveToDatabase() {
-  getStatApiData();
-  getTeamApiData();
-  disconnect();
+async function saveToDatabase() {
+  await getStatApiData();
+  await getTeamApiData();
+  // await disconnect();
 }
 
 module.exports = {
